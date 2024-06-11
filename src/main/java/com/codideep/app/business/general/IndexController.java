@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("")
 public class IndexController {
-    @GetMapping("")
-    public ResponseEntity<SoIndexGet> actionIndexGet() {
-        SoIndexGet soIndexGet = new SoIndexGet();
+	@GetMapping("")
+	public ResponseEntity<SoIndexGet> actionIndexGet() {
+		SoIndexGet soIndexGet = new SoIndexGet();
 
-        soIndexGet.setMessage("Bienvenido(a) a tu primera aplicación con Spring Boot.");
-        soIndexGet.setType("success");
+		soIndexGet.setMessage("Bienvenido(a) a tu primera aplicación con Spring Boot.");
+		soIndexGet.setType("success");
 
-        return new ResponseEntity<>(soIndexGet, HttpStatus.OK);
-    }
+		return new ResponseEntity<>(soIndexGet, HttpStatus.OK);
+	}
 }
