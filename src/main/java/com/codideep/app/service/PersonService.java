@@ -1,7 +1,9 @@
 package com.codideep.app.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,27 @@ import com.codideep.app.repository.PersonRepository;
 public class PersonService {
 	@Autowired
 	private PersonRepository personRepository;
+
+	public boolean insert(DtoPerson dtoPerson) {
+		dtoPerson.setIdPerson(UUID.randomUUID().toString());
+		dtoPerson.setCreatedAt(new Date());
+		dtoPerson.setUpdatedAt(new Date());
+
+		TPerson tPerson = new TPerson();
+
+		tPerson.setIdPerson(dtoPerson.getIdPerson());
+		tPerson.setFirstName(dtoPerson.getFirstName());
+		tPerson.setSurName(dtoPerson.getSurName());
+		tPerson.setDni(dtoPerson.getDni());
+		tPerson.setGender(dtoPerson.getGender());
+		tPerson.setBirthDate(dtoPerson.getBirthDate());
+		tPerson.setCreatedAt(dtoPerson.getCreatedAt());
+		tPerson.setUpdatedAt(dtoPerson.getUpdatedAt());
+
+		personRepository.save(tPerson);
+
+		return true;
+	}
 
 	public List<DtoPerson> getAll() {
 		List<TPerson> listTPerson = personRepository.findAll();

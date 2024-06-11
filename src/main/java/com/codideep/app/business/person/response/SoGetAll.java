@@ -2,7 +2,7 @@ package com.codideep.app.business.person.response;
 
 import java.util.Date;
 
-public class SoPersonGetAll {
+public class SoGetAll {
 	public String idPerson;
 	public String firstName;
 	public String surName;
@@ -10,7 +10,7 @@ public class SoPersonGetAll {
 	public Boolean gender;
 	public Date birthDate;
 
-    public SoPersonGetAll(
+    public SoGetAll(
         String idPerson,
         String firstName,
         String surName,
