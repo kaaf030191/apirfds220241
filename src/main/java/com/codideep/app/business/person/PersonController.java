@@ -1,7 +1,7 @@
 package com.codideep.app.business.person;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +26,17 @@ public class PersonController {
 
 	@PostMapping(path = "insert", consumes = { "multipart/form-data" })
 	public ResponseEntity<Boolean> actionInsert(@ModelAttribute SoInsert soInsert) {
-		DtoPerson dtoPerson = new DtoPerson();
+		try {
+			DtoPerson dtoPerson = new DtoPerson();
 
-		dtoPerson.setFirstName(soInsert.getFirstName());
-		dtoPerson.setSurName(soInsert.getSurName());
-		dtoPerson.setDni(soInsert.getDni());
-		dtoPerson.setGender(soInsert.isGender());
-		dtoPerson.setBirthDate(new Date());
+			dtoPerson.setFirstName(soInsert.getFirstName());
+			dtoPerson.setSurName(soInsert.getSurName());
+			dtoPerson.setDni(soInsert.getDni());
+			dtoPerson.setGender(soInsert.isGender());
+			dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soInsert.getBirthDate()));
 
-		personService.insert(dtoPerson);
+			personService.insert(dtoPerson);
+		} catch(Exception e) { }
 
 		return new ResponseEntity<>(true, HttpStatus.CREATED);
 	}
