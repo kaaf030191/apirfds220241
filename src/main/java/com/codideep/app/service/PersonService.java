@@ -60,4 +60,10 @@ public class PersonService {
 		
 		return listDtoPerson;
 	}
+
+	public boolean delete(String idPerson) {
+		personRepository.deleteById(idPerson);
+
+		return true;
+	}
 }
