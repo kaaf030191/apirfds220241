@@ -3,6 +3,7 @@ package com.codideep.app.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,27 @@ public class PersonService {
 
 	public boolean delete(String idPerson) {
 		personRepository.deleteById(idPerson);
+
+		return true;
+	}
+
+	public boolean update(DtoPerson dtoPerson) {
+		dtoPerson.setUpdatedAt(new Date());
+
+		Optional<TPerson> optionTPeson = personRepository.findById(dtoPerson.getIdPerson());
+
+		if(!optionTPeson.isPresent()) {
+			return false;
+		}
+
+		optionTPeson.get().setFirstName(dtoPerson.getFirstName());
+		optionTPeson.get().setSurName(dtoPerson.getSurName());
+		optionTPeson.get().setDni(dtoPerson.getDni());
+		optionTPeson.get().setGender(dtoPerson.getGender());
+		optionTPeson.get().setBirthDate(dtoPerson.getBirthDate());
+		optionTPeson.get().setUpdatedAt(dtoPerson.getUpdatedAt());
+
+		personRepository.save(optionTPeson.get());
 
 		return true;
 	}

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codideep.app.business.person.request.SoInsert;
+import com.codideep.app.business.person.request.SoUpdate;
 import com.codideep.app.business.person.response.SoGetAll;
 import com.codideep.app.dto.DtoPerson;
 import com.codideep.app.service.PersonService;
@@ -68,5 +69,23 @@ public class PersonController {
 		personService.delete(idPerson);
 
 		return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
+	}
+
+	@PostMapping(path = "update", consumes = { "multipart/form-data" })
+	public ResponseEntity<Boolean> actionUpdate(@ModelAttribute SoUpdate soUpdate) {
+		try {
+			DtoPerson dtoPerson = new DtoPerson();
+
+			dtoPerson.setIdPerson(soUpdate.getIdPerson());
+			dtoPerson.setFirstName(soUpdate.getFirstName());
+			dtoPerson.setSurName(soUpdate.getSurName());
+			dtoPerson.setDni(soUpdate.getDni());
+			dtoPerson.setGender(soUpdate.isGender());
+			dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soUpdate.getBirthDate()));
+
+			personService.update(dtoPerson);
+		} catch(Exception e) { }
+
+		return new ResponseEntity<>(true, HttpStatus.OK);
 	}
 }
