@@ -2,11 +2,14 @@ package com.codideep.app.business.person;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +24,8 @@ import com.codideep.app.business.person.response.SoGetAll;
 import com.codideep.app.dto.DtoPerson;
 import com.codideep.app.service.PersonService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("person")
 public class PersonController {
@@ -28,20 +33,43 @@ public class PersonController {
 	private PersonService personService;
 
 	@PostMapping(path = "insert", consumes = { "multipart/form-data" })
-	public ResponseEntity<Boolean> actionInsert(@ModelAttribute SoInsert soInsert) {
+	public ResponseEntity<Map<String, String>> actionInsert(@Valid @ModelAttribute SoInsert soInsert, BindingResult bindingResult) {
 		try {
-			DtoPerson dtoPerson = new DtoPerson();
+			if(bindingResult.hasErrors()) {
+				StringBuilder errors = new StringBuilder();
 
-			dtoPerson.setFirstName(soInsert.getFirstName());
-			dtoPerson.setSurName(soInsert.getSurName());
-			dtoPerson.setDni(soInsert.getDni());
-			dtoPerson.setGender(soInsert.isGender());
-			dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soInsert.getBirthDate()));
+				bindingResult.getAllErrors().forEach(error -> {
+					errors.append(error.getDefaultMessage()).append("; ");
+				});
+				
+				Map<String, String> response = new HashMap<>();
 
-			personService.insert(dtoPerson);
-		} catch(Exception e) { }
+				response.put("error", errors.toString());
 
-		return new ResponseEntity<>(true, HttpStatus.CREATED);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+		// 	DtoPerson dtoPerson = new DtoPerson();
+
+		// 	dtoPerson.setFirstName(soInsert.getFirstName());
+		// 	dtoPerson.setSurName(soInsert.getSurName());
+		// 	dtoPerson.setDni(soInsert.getDni());
+		// 	dtoPerson.setGender(soInsert.isGender());
+		// 	dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soInsert.getBirthDate()));
+
+		// 	personService.insert(dtoPerson);
+		} catch(Exception e) {
+			Map<String, String> response = new HashMap<>();
+
+			response.put("type", e.getMessage());
+
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		Map<String, String> response = new HashMap<>();
+
+		response.put("type", "success");
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@GetMapping(path = "getall")
