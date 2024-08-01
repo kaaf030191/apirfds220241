@@ -1,7 +1,7 @@
 package com.codideep.app.business.person.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +17,7 @@ public class SoInsert {
 	@NotBlank(message = "El campo \"dni\" es requerido.")
 	private String dni;
 
-	@NotEmpty(message = "El campo \"gender\" es requerido.")
+	@NotNull(message = "El campo \"gender\" es requerido.")
 	private boolean gender;
 
 	@NotBlank(message = "El campo \"birthDate\" es requerido.")

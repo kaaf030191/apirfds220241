@@ -2,9 +2,7 @@ package com.codideep.app.business.person;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,53 +31,47 @@ public class PersonController {
 	private PersonService personService;
 
 	@PostMapping(path = "insert", consumes = { "multipart/form-data" })
-	public ResponseEntity<Map<String, String>> actionInsert(@Valid @ModelAttribute SoInsert soInsert, BindingResult bindingResult) {
+	public ResponseEntity<com.codideep.app.business.person.response.SoInsert> actionInsert(@Valid @ModelAttribute SoInsert soInsert, BindingResult bindingResult) {
+		com.codideep.app.business.person.response.SoInsert responseSoInsert = new com.codideep.app.business.person.response.SoInsert();
+
 		try {
 			if(bindingResult.hasErrors()) {
-				StringBuilder errors = new StringBuilder();
-
 				bindingResult.getAllErrors().forEach(error -> {
-					errors.append(error.getDefaultMessage()).append("; ");
+					responseSoInsert.addResponseMesssage(error.getDefaultMessage());
 				});
 				
-				Map<String, String> response = new HashMap<>();
-
-				response.put("error", errors.toString());
-
-				return new ResponseEntity<>(response, HttpStatus.OK);
+				return new ResponseEntity<>(responseSoInsert, HttpStatus.OK);
 			}
-		// 	DtoPerson dtoPerson = new DtoPerson();
 
-		// 	dtoPerson.setFirstName(soInsert.getFirstName());
-		// 	dtoPerson.setSurName(soInsert.getSurName());
-		// 	dtoPerson.setDni(soInsert.getDni());
-		// 	dtoPerson.setGender(soInsert.isGender());
-		// 	dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soInsert.getBirthDate()));
+			DtoPerson dtoPerson = new DtoPerson();
 
-		// 	personService.insert(dtoPerson);
+			dtoPerson.setFirstName(soInsert.getFirstName());
+			dtoPerson.setSurName(soInsert.getSurName());
+			dtoPerson.setDni(soInsert.getDni());
+			dtoPerson.setGender(soInsert.isGender());
+			dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soInsert.getBirthDate()));
+
+			personService.insert(dtoPerson);
+
+			responseSoInsert.setType("success");
+			responseSoInsert.addResponseMesssage("Operación realizada correctamente.");
+
+			return new ResponseEntity<>(responseSoInsert, HttpStatus.CREATED);
 		} catch(Exception e) {
-			Map<String, String> response = new HashMap<>();
-
-			response.put("type", e.getMessage());
-
-			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(responseSoInsert, HttpStatus.BAD_REQUEST);
 		}
-
-		Map<String, String> response = new HashMap<>();
-
-		response.put("type", "success");
-
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@GetMapping(path = "getall")
-	public ResponseEntity<List<SoGetAll>> actionGetAll() {
+	public ResponseEntity<com.codideep.app.business.person.response.SoGetAll> actionGetAll() {
+		com.codideep.app.business.person.response.SoGetAll responseSoGetAll = new com.codideep.app.business.person.response.SoGetAll();
+
 		List<DtoPerson> listDtoPerson = personService.getAll();
 
-		List<SoGetAll> listSoPersonGet = new ArrayList<>();
+		responseSoGetAll.setDto(new ArrayList<>());
 
 		for (DtoPerson dtoPerson : listDtoPerson) {
-			listSoPersonGet.add(new SoGetAll(
+			responseSoGetAll.getDto().add(new SoGetAll(
 				dtoPerson.getIdPerson(),
 				dtoPerson.getFirstName(),
 				dtoPerson.getSurName(),
@@ -89,7 +81,9 @@ public class PersonController {
 			));
 		}
 
-		return new ResponseEntity<>(listSoPersonGet, HttpStatus.OK);
+		responseSoGetAll.setType("success");
+
+		return new ResponseEntity<>(responseSoGetAll, HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "delete/{idPerson}")
