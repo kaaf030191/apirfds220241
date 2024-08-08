@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codideep.app.business.person.request.RequestInsert;
 import com.codideep.app.business.person.request.RequestUpdate;
+import com.codideep.app.business.person.response.ResponseDelete;
 import com.codideep.app.business.person.response.ResponseGetAll;
 import com.codideep.app.business.person.response.ResponseInsert;
+import com.codideep.app.business.person.response.ResponseUpdate;
 import com.codideep.app.dto.DtoPerson;
 import com.codideep.app.service.PersonService;
 
@@ -34,15 +36,15 @@ public class PersonController {
 
 	@PostMapping(path = "insert", consumes = { "multipart/form-data" })
 	public ResponseEntity<ResponseInsert> actionInsert(@Valid @ModelAttribute RequestInsert soInsert, BindingResult bindingResult) {
-		ResponseInsert responseSoInsert = new ResponseInsert();
+		ResponseInsert responseInsert = new ResponseInsert();
 
 		try {
 			if(bindingResult.hasErrors()) {
 				bindingResult.getAllErrors().forEach(error -> {
-					responseSoInsert.addResponseMesssage(error.getDefaultMessage());
+					responseInsert.addResponseMesssage(error.getDefaultMessage());
 				});
 				
-				return new ResponseEntity<>(responseSoInsert, HttpStatus.OK);
+				return new ResponseEntity<>(responseInsert, HttpStatus.OK);
 			}
 
 			DtoPerson dtoPerson = new DtoPerson();
@@ -55,18 +57,21 @@ public class PersonController {
 
 			personService.insert(dtoPerson);
 
-			responseSoInsert.success();
-			responseSoInsert.addResponseMesssage("Operación realizada correctamente.");
+			responseInsert.success();
+			responseInsert.addResponseMesssage("Operación realizada correctamente.");
 
-			return new ResponseEntity<>(responseSoInsert, HttpStatus.CREATED);
+			return new ResponseEntity<>(responseInsert, HttpStatus.CREATED);
 		} catch(Exception e) {
-			return new ResponseEntity<>(responseSoInsert, HttpStatus.BAD_REQUEST);
+			responseInsert.exception();
+			responseInsert.addResponseMesssage("Ocurrió un error inesperado, estamos trabajando para solucionarlo.");
+
+			return new ResponseEntity<>(responseInsert, HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@GetMapping(path = "getall")
 	public ResponseEntity<ResponseGetAll> actionGetAll() {
-		ResponseGetAll responseSoGetAll = new ResponseGetAll();
+		ResponseGetAll responseGetAll = new ResponseGetAll();
 
 		List<DtoPerson> listDtoPerson = personService.getAll();
 
@@ -80,23 +85,30 @@ public class PersonController {
 			map.put("gender", dtoPerson.getGender());
 			map.put("birthDate", dtoPerson.getBirthDate());
 
-			responseSoGetAll.dto.listPerson.add(map);
+			responseGetAll.dto.listPerson.add(map);
 		}
 
-		responseSoGetAll.success();
+		responseGetAll.success();
 
-		return new ResponseEntity<>(responseSoGetAll, HttpStatus.OK);
+		return new ResponseEntity<>(responseGetAll, HttpStatus.OK);
 	}
 
 	@DeleteMapping(path = "delete/{idPerson}")
-	public ResponseEntity<Boolean> actionDelete(@PathVariable String idPerson) {
+	public ResponseEntity<ResponseDelete> actionDelete(@PathVariable String idPerson) {
+		ResponseDelete responseDelete = new ResponseDelete();
+
 		personService.delete(idPerson);
 
-		return new ResponseEntity<>(true, HttpStatus.NO_CONTENT);
+		responseDelete.success();
+		responseDelete.addResponseMesssage("Operación realizada correctamente.");
+
+		return new ResponseEntity<>(responseDelete, HttpStatus.OK);
 	}
 
 	@PostMapping(path = "update", consumes = { "multipart/form-data" })
-	public ResponseEntity<Boolean> actionUpdate(@ModelAttribute RequestUpdate soUpdate) {
+	public ResponseEntity<ResponseUpdate> actionUpdate(@ModelAttribute RequestUpdate soUpdate) {
+		ResponseUpdate responseUpdate = new ResponseUpdate();
+
 		try {
 			DtoPerson dtoPerson = new DtoPerson();
 
@@ -108,8 +120,16 @@ public class PersonController {
 			dtoPerson.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse(soUpdate.getBirthDate()));
 
 			personService.update(dtoPerson);
-		} catch(Exception e) { }
 
-		return new ResponseEntity<>(true, HttpStatus.OK);
+			responseUpdate.success();
+			responseUpdate.addResponseMesssage("Operación realizada correctamente.");
+
+			return new ResponseEntity<>(responseUpdate, HttpStatus.OK);
+		} catch(Exception e) {
+			responseUpdate.exception();
+			responseUpdate.addResponseMesssage("Ocurrió un error inesperado, estamos trabajando para solucionarlo.");
+
+			return new ResponseEntity<>(responseUpdate, HttpStatus.BAD_REQUEST);
+		}
 	}
 }
