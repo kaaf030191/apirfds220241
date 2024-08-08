@@ -1,8 +1,9 @@
 package com.codideep.app.business.person;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codideep.app.business.person.request.SoInsert;
-import com.codideep.app.business.person.request.SoUpdate;
-import com.codideep.app.business.person.response.SoGetAll;
+import com.codideep.app.business.person.request.RequestInsert;
+import com.codideep.app.business.person.request.RequestUpdate;
+import com.codideep.app.business.person.response.ResponseGetAll;
+import com.codideep.app.business.person.response.ResponseInsert;
 import com.codideep.app.dto.DtoPerson;
 import com.codideep.app.service.PersonService;
 
@@ -31,8 +33,8 @@ public class PersonController {
 	private PersonService personService;
 
 	@PostMapping(path = "insert", consumes = { "multipart/form-data" })
-	public ResponseEntity<com.codideep.app.business.person.response.SoInsert> actionInsert(@Valid @ModelAttribute SoInsert soInsert, BindingResult bindingResult) {
-		com.codideep.app.business.person.response.SoInsert responseSoInsert = new com.codideep.app.business.person.response.SoInsert();
+	public ResponseEntity<ResponseInsert> actionInsert(@Valid @ModelAttribute RequestInsert soInsert, BindingResult bindingResult) {
+		ResponseInsert responseSoInsert = new ResponseInsert();
 
 		try {
 			if(bindingResult.hasErrors()) {
@@ -53,7 +55,7 @@ public class PersonController {
 
 			personService.insert(dtoPerson);
 
-			responseSoInsert.setType("success");
+			responseSoInsert.success();
 			responseSoInsert.addResponseMesssage("Operación realizada correctamente.");
 
 			return new ResponseEntity<>(responseSoInsert, HttpStatus.CREATED);
@@ -63,25 +65,25 @@ public class PersonController {
 	}
 
 	@GetMapping(path = "getall")
-	public ResponseEntity<com.codideep.app.business.person.response.SoGetAll> actionGetAll() {
-		com.codideep.app.business.person.response.SoGetAll responseSoGetAll = new com.codideep.app.business.person.response.SoGetAll();
+	public ResponseEntity<ResponseGetAll> actionGetAll() {
+		ResponseGetAll responseSoGetAll = new ResponseGetAll();
 
 		List<DtoPerson> listDtoPerson = personService.getAll();
 
-		responseSoGetAll.setDto(new ArrayList<>());
-
 		for (DtoPerson dtoPerson : listDtoPerson) {
-			responseSoGetAll.getDto().add(new SoGetAll(
-				dtoPerson.getIdPerson(),
-				dtoPerson.getFirstName(),
-				dtoPerson.getSurName(),
-				dtoPerson.getDni(),
-				dtoPerson.getGender(),
-				dtoPerson.getBirthDate()
-			));
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("idPerson", dtoPerson.getIdPerson());
+			map.put("firstName", dtoPerson.getFirstName());
+			map.put("surName", dtoPerson.getSurName());
+			map.put("dni", dtoPerson.getDni());
+			map.put("gender", dtoPerson.getGender());
+			map.put("birthDate", dtoPerson.getBirthDate());
+
+			responseSoGetAll.dto.listPerson.add(map);
 		}
 
-		responseSoGetAll.setType("success");
+		responseSoGetAll.success();
 
 		return new ResponseEntity<>(responseSoGetAll, HttpStatus.OK);
 	}
@@ -94,7 +96,7 @@ public class PersonController {
 	}
 
 	@PostMapping(path = "update", consumes = { "multipart/form-data" })
-	public ResponseEntity<Boolean> actionUpdate(@ModelAttribute SoUpdate soUpdate) {
+	public ResponseEntity<Boolean> actionUpdate(@ModelAttribute RequestUpdate soUpdate) {
 		try {
 			DtoPerson dtoPerson = new DtoPerson();
 

@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SoInsert {
+public class RequestInsert {
 	@NotBlank(message = "El campo \"firstName\" es requerido.")
 	private String firstName;
 
