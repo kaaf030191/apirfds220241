@@ -1,6 +1,15 @@
 create database dbgeneral;
 use dbgeneral;
 
+create table tuser(
+idUser char(36) not null,
+nameUser varchar(700) not null,
+password varchar(2000) not null,
+createdAt datetime not null,
+updatedAt datetime not null,
+primary key(idUser)
+) engine=innodb;
+
 create table tperson(
 idPerson char(36) not null,
 firstName varchar(70) not null,
